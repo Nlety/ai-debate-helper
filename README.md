@@ -2,7 +2,7 @@
 
 本项目由阿里云ESA提供加速、计算和保护
 
-<img src="https://img.alicdn.com/imgextra/i1/O1CN01VlMQfr1PcMblVlmtZ_!!6000000001861-0-tps-994-562.jpg" width="50%" />
+<img src="https://img.alicdn.com/imgextra/i3/O1CN01H1UU3i1Cti9lYtFrs_!!6000000000139-2-tps-7534-844.png" width="50%" />
 
 ## 项目简介
 
