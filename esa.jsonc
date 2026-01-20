@@ -1,15 +1,7 @@
 {
     "name": "ai-debate-helper",
-    "routes": [
-        {
-            "path": "/api/debate-storage",
-            "function": "debate-storage"
-        }
-    ],
-    "functions": [
-        {
-            "name": "debate-storage",
-            "entry": "edge-functions/debate-storage.js"
-        }
-    ]
+    "entry": "./edge-functions/debate-storage.js",
+    "assets": {
+        "directory": "./"
+    }
 }
