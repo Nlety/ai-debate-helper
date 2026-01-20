@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 辩论助手 - AI Debate Helper</title>
+    <meta name="description" content="AI驱动的辩论观点生成器">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-slate-200 font-sans">
+    <div id="app" class="min-h-screen flex flex-col">
+        <header class="px-6 py-4 backdrop-blur-sm bg-white/70 border-b border-slate-200/50 sticky top-0 z-50">
+            <div class="max-w-4xl mx-auto flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-slate-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-slate-500/30">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg></div>
+                    <div>
+                        <h1
+                            class="text-xl font-bold bg-gradient-to-r from-slate-700 to-blue-600 bg-clip-text text-transparent">
+                            AI 辩论助手</h1>
+                        <p class="text-xs text-gray-500">AI Debate Helper</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button id="btn-history"
+                        class="p-2 bg-white/80 hover:bg-white rounded-xl shadow-sm hover:shadow-md transition-all"
+                        title="辩论记录"><svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg></button>
+                    <button id="btn-settings"
+                        class="p-2 bg-white/80 hover:bg-white rounded-xl shadow-sm hover:shadow-md transition-all"
+                        title="设置"><svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg></button>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 max-w-4xl mx-auto w-full p-6">
+            <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl shadow-slate-200/50 p-6 mb-6">
+                <div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-2">🎯 辩题</label><input
+                        id="topic-input" type="text" placeholder="例如：人工智能是否会取代人类工作？"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">🎭 立场</label><select id="side"
+                            class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                            <option value="pro">正方（支持）</option>
+                            <option value="con">反方（反对）</option>
+                            <option value="both">双方分析</option>
+                        </select></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">📊 深度</label><select id="depth"
+                            class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                            <option value="quick">快速要点</option>
+                            <option value="standard" selected>标准分析</option>
+                            <option value="deep">深度论证</option>
+                        </select></div>
+                </div>
+                <div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-1">💡 补充背景</label><textarea
+                        id="context" placeholder="可选：提供一些背景信息或你希望重点论证的方向..." rows="2"
+                        class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl resize-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <button id="btn-generate"
+                    class="w-full py-3 bg-gradient-to-r from-slate-600 to-blue-600 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                    生成辩论观点
+                </button>
+            </div>
+
+            <div id="result-area" class="hidden">
+                <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl shadow-slate-200/50 overflow-hidden">
+                    <div
+                        class="p-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-blue-50">
+                        <h2 class="text-lg font-bold text-gray-800">💬 辩论观点</h2><button id="btn-save"
+                            class="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-500">💾
+                            保存</button>
+                    </div>
+                    <div id="content" class="p-6 text-gray-700 leading-relaxed"></div>
+                </div>
+            </div>
+        </main>
+        <footer class="px-6 py-4 text-center text-sm text-gray-400">
+            <p>Powered by AI • 基于阿里云 ESA</p>
+        </footer>
+    </div>
+
+    <div id="examples-panel" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
+        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3">
+            <span class="text-sm text-gray-500 font-medium">热门辩题:</span>
+            <button class="example-btn px-3 py-1.5 bg-slate-100 text-slate-600 text-sm rounded-lg hover:bg-slate-200"
+                data-example="ai">🤖 AI取代工作</button>
+            <button class="example-btn px-3 py-1.5 bg-blue-50 text-blue-600 text-sm rounded-lg hover:bg-blue-100"
+                data-example="996">💼 996工作制</button>
+            <button class="example-btn px-3 py-1.5 bg-indigo-50 text-indigo-600 text-sm rounded-lg hover:bg-indigo-100"
+                data-example="edu">📚 应试教育</button>
+            <button class="example-btn px-3 py-1.5 bg-violet-50 text-violet-600 text-sm rounded-lg hover:bg-violet-100"
+                data-example="social">📱 社交媒体</button>
+        </div>
+    </div>
+
+    <div id="history-panel"
+        class="fixed inset-y-0 right-0 w-80 bg-white border-l border-slate-200 transform translate-x-full transition-transform duration-300 z-50">
+        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="font-semibold text-gray-700">辩论记录</h3><button id="btn-close-history"
+                class="text-gray-400 hover:text-gray-600"><svg class="w-5 h-5" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg></button>
+        </div>
+        <div id="history-list" class="p-4 space-y-3 overflow-y-auto max-h-[calc(100vh-80px)]"></div>
+    </div>
+    <div id="history-overlay" class="fixed inset-0 bg-black/50 hidden z-40"></div>
+
+    <div id="settings-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4">
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-800">模型设置</h3><button id="btn-close-settings"
+                    class="text-gray-400 hover:text-gray-600"><svg class="w-5 h-5" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">API 地址</label><input id="api-url"
+                        type="text"
+                        class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">API Key</label><input id="api-key"
+                        type="password"
+                        class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">模型名称</label><input id="model-name"
+                        type="text"
+                        class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3"><button id="btn-cancel-settings"
+                    class="px-4 py-2 text-gray-600 rounded-xl">取消</button><button id="btn-save-settings"
+                    class="px-4 py-2 bg-gradient-to-r from-slate-600 to-blue-600 text-white rounded-xl">保存配置</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed top-6 right-6 z-50 hidden">
+        <div class="bg-white rounded-xl shadow-2xl px-6 py-4 flex items-center gap-3">
+            <div id="toast-icon" class="w-8 h-8 rounded-full flex items-center justify-center"></div>
+            <div>
+                <p id="toast-title" class="font-semibold text-gray-800"></p>
+                <p id="toast-message" class="text-sm text-gray-500"></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/aiService.js"></script>
+    <script src="js/storageService.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
